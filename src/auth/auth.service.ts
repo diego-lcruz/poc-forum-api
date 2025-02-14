@@ -12,7 +12,7 @@ export class AuthService {
     @Inject()
     private readonly jwtService: JwtService;
 
-    async signin(params: Prisma.UserCreateInput): Promise<Omit<User,'password'>> {
+    async signin(params: Prisma.UserCreateInput): Promise<{acess_token: string}> {
         const user = await this.userService.user({ email: params.email });
         if(!user)throw new NotFoundException('User not found');
         const passwordMatch = await bcrypt.compare(params.password, user.password);
@@ -20,9 +20,8 @@ export class AuthService {
 
         const payload = {sub: user.id};
 
-        const {password,...result} = user;
 
-        return result;
+        return {acess_token: await this.jwtService.signAsync(payload)};
 
     }
 }
