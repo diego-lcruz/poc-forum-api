@@ -7,20 +7,22 @@ export class UserService {
     @Inject()
     private readonly prisma: PrismaService;
 
+    async user(
+        userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+    ): Promise<User | null> {
+        return this.prisma.user.findUnique({
+            where: userWhereUniqueInput,
+        });
+    }
+
     async createUser(data: Prisma.UserCreateInput) {
         const hashedPassword = await bcrypt.hash(data.password, 10);
 
 
-        return this.prisma.user.create({ data: {...data, password: hashedPassword} });
+        return this.prisma.user.create({ 
+            data: {...data, password: hashedPassword} 
+        });
     }
-
-    // async findManyUsers() {
-    //     return this.prisma.user.findMany();
-    // }
-
-    // async findUniqueUser(where: Prisma.UserWhereUniqueInput) {
-    //     return this.prisma.user.findUnique({ where });
-    // }
 
     async updateUser(params: {
         where: Prisma.UserWhereUniqueInput;
